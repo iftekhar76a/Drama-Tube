@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  ════════════════════════════════════════════════════════════════
+   Personal Cloud & Memory Vault — profile.html (Friend Profile)
+   Author  : Elite Full-Stack Developer
+   Version : 1.0.0
+   Theme   : Glassmorphism × Minimalist Dark Mode
+   Data    : Pulled dynamically via ?id= URL parameter from Firestore
+  ════════════════════════════════════════════════════════════════
+-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Friend profile — Personal Cloud & Memory Vault" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;1,9..40,300&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- FontAwesome 6 -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Project Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Title is updated dynamically by profile.js -->
+  <title>Loading Profile — Memory Vault</title>
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════
+       PAGE LOADER
+  ══════════════════════════════════════════════════════════ -->
+  <div id="page-loader" role="status" aria-label="Loading profile">
+    <div class="loader-ring" aria-hidden="true"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SITE HEADER
+  ══════════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+
+      <!-- Logo / Home Link -->
+      <a href="index.html" class="logo" aria-label="Back to Memory Vault Dashboard">
+        <div class="logo-icon" aria-hidden="true">
+          <i class="fa-solid fa-vault"></i>
+        </div>
+        <span class="logo-text">Memory<span>Vault</span></span>
+      </a>
+
+      <!-- Nav actions (auth state managed by profile.js) -->
+      <nav class="nav-actions" aria-label="User actions">
+
+        <div
+          id="auth-badge"
+          class="auth-badge"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="dot" aria-hidden="true"></span>
+          <span id="auth-badge-label">Visitor</span>
+        </div>
+
+        <!-- Login Button is not functional on profile page (read-only visit path),
+             but it keeps UI consistency. Admin would normally come from dashboard. -->
+        <button id="btn-login" class="btn btn-ghost hidden" aria-label="Admin login">
+          <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i>
+        </button>
+
+        <button id="btn-logout" class="btn btn-ghost hidden" aria-label="Sign out">
+          <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+          <span>Sign Out</span>
+        </button>
+
+      </nav>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       BACK NAVIGATION
+  ══════════════════════════════════════════════════════════ -->
+  <div class="back-nav">
+    <div class="container">
+      <a href="index.html" class="back-link" aria-label="Return to dashboard">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       PROFILE NOT FOUND (404 State)
+       Shown only if the Firestore document does not exist.
+  ══════════════════════════════════════════════════════════ -->
+  <div id="profile-not-found" class="hidden">
+    <div class="container" style="padding-block: 4rem; text-align: center;">
+      <div class="empty-icon">
+        <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+      </div>
+      <h2 class="empty-title" style="font-size:1.5rem;">Profile Not Found</h2>
+      <p class="empty-sub" style="margin-top:0.5rem;">
+        This contact doesn't exist or may have been deleted.
+      </p>
+      <a href="index.html" class="btn btn-primary" style="margin-top:1.5rem; display:inline-flex;">
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+        Return to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════════════════════ -->
+  <main id="main-content">
+
+    <!-- ── Profile Hero Section ──────────────────────────── -->
+    <section class="profile-hero" aria-labelledby="profile-name">
+      <div class="container">
+        <div class="profile-hero-inner animate-fade-up">
+
+          <!-- Avatar: platform-branded icon, populated by profile.js -->
+          <div
+            id="profile-avatar"
+            class="profile-avatar"
+            aria-hidden="true"
+          >
+            <!-- Icon injected by JS -->
+          </div>
+
+          <!-- Info block -->
+          <div class="profile-info">
+
+            <!-- Name (dynamic) -->
+            <h1
+              id="profile-name"
+              class="profile-name text-gradient"
+              aria-label="Contact name"
+            >
+              <!-- Filled by profile.js -->
+            </h1>
+
+            <!-- Meta row: platform badge + birthday chip -->
+            <div class="profile-meta">
+
+              <!-- Platform badge (dynamic class + text) -->
+              <span
+                id="profile-badge"
+                class="platform-badge"
+                aria-label="Platform"
+              ></span>
+
+              <!-- Birthday -->
+              <div class="meta-chip">
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                Birthday:
+                <span id="profile-birthday" style="margin-left:4px;color:#e2e8f0;">
+                  <!-- Filled by profile.js -->
+                </span>
+              </div>
+
+            </div><!-- /.profile-meta -->
+
+            <!-- Bio -->
+            <p id="profile-bio" class="profile-bio">
+              <!-- Filled by profile.js -->
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="profile-actions">
+
+              <!-- External social profile link -->
+              <a
+                id="profile-link"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-primary hidden"
+                aria-label="Open social media profile"
+              >
+                <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                Visit Profile
+              </a>
+
+              <!-- Back to dashboard -->
+              <a href="index.html" class="btn btn-ghost">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                Dashboard
+              </a>
+
+            </div><!-- /.profile-actions -->
+
+          </div><!-- /.profile-info -->
+        </div><!-- /.profile-hero-inner -->
+      </div><!-- /.container -->
+    </section>
+    <!-- /.profile-hero -->
+
+    <!-- ══════════════════════════════════════════════════
+         MEDIA TABS SECTION
+    ══════════════════════════════════════════════════════ -->
+    <section class="container" aria-labelledby="media-heading" style="margin-top: var(--sp-4);">
+
+      <h2 id="media-heading" class="visually-hidden">Media & Memories</h2>
+
+      <!-- Tab Navigation -->
+      <nav
+        class="tabs-nav"
+        role="tablist"
+        aria-label="Media sections"
+      >
+        <button
+          class="tab-btn active"
+          role="tab"
+          data-tab="images"
+          aria-selected="true"
+          aria-controls="tab-images"
+          id="tab-btn-images"
+        >
+          <i class="fa-solid fa-images" aria-hidden="true"></i>
+          Images
+        </button>
+
+        <button
+          class="tab-btn"
+          role="tab"
+          data-tab="videos"
+          aria-selected="false"
+          aria-controls="tab-videos"
+          id="tab-btn-videos"
+        >
+          <i class="fa-solid fa-film" aria-hidden="true"></i>
+          Videos
+        </button>
+
+        <button
+          class="tab-btn"
+          role="tab"
+          data-tab="contact"
+          aria-selected="false"
+          aria-controls="tab-contact"
+          id="tab-btn-contact"
+        >
+          <i class="fa-solid fa-address-card" aria-hidden="true"></i>
+          Contact Card
+        </button>
+      </nav>
+
+      <!-- ── Tab: Images ──────────────────────────────────── -->
+      <div
+        id="tab-images"
+        class="tab-pane active"
+        role="tabpanel"
+        aria-labelledby="tab-btn-images"
+      >
+        <!-- Image Gallery Grid (populated by profile.js) -->
+        <div
+          id="image-gallery"
+          class="image-gallery stagger-children"
+          aria-label="Photo gallery"
+        >
+          <!-- Dynamic content injected by profile.js -->
+        </div>
+      </div>
+
+      <!-- ── Tab: Videos ──────────────────────────────────── -->
+      <div
+        id="tab-videos"
+        class="tab-pane"
+        role="tabpanel"
+        aria-labelledby="tab-btn-videos"
+      >
+        <!-- Video Grid (populated by profile.js) -->
+        <div
+          id="video-grid"
+          class="video-grid"
+          aria-label="Video vault"
+        >
+          <!-- Dynamic content injected by profile.js -->
+        </div>
+      </div>
+
+      <!-- ── Tab: Contact Card ─────────────────────────────── -->
+      <div
+        id="tab-contact"
+        class="tab-pane"
+        role="tabpanel"
+        aria-labelledby="tab-btn-contact"
+      >
+        <div
+          class="glass"
+          style="padding:var(--sp-8);border-radius:var(--r-xl);max-width:480px;"
+        >
+          <div style="margin-bottom:var(--sp-6);">
+            <p class="section-eyebrow">
+              <i class="fa-solid fa-address-card" aria-hidden="true"></i>
+              Quick Contact
+            </p>
+            <h3 style="font-size:1.3rem;margin-top:var(--sp-2);">
+              Reach out directly
+            </h3>
+            <p class="text-muted text-sm" style="margin-top:var(--sp-2);">
+              Opens their social profile in a new tab where you can send them a message.
+            </p>
+          </div>
+          <a
+            id="contact-card-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-primary"
+            aria-label="Open social media profile to contact"
+          >
+            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+            Open Profile &amp; Message
+          </a>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════
+           ADMIN UPLOAD PANEL
+           Hidden for visitors. Shown to admins by profile.js.
+      ════════════════════════════════════════════════════════ -->
+      <div
+        id="upload-panel"
+        class="upload-panel hidden"
+        aria-label="Admin media upload panel"
+      >
+        <div class="upload-panel-header">
+          <h3 style="font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
+            <i class="fa-solid fa-cloud-arrow-up" style="color:var(--accent-primary);" aria-hidden="true"></i>
+            Upload Media
+          </h3>
+          <span class="upload-panel-badge">Admin Only</span>
+        </div>
+
+        <!-- ── Image Upload Section ─────────────────────── -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fa-solid fa-image" aria-hidden="true"></i>
+            Add Image
+          </label>
+
+          <!-- Dropzone / File Picker -->
+          <div
+            id="image-dropzone"
+            class="dropzone"
+            role="button"
+            tabindex="0"
+            aria-label="Click or drop an image file here to upload"
+          >
+            <!-- Hidden real file input, triggered by dropzone click -->
+            <input
+              type="file"
+              id="image-file-input"
+              accept="image/*"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+            <div class="dropzone-icon" aria-hidden="true">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <p class="dropzone-text">
+              <strong>Click to browse</strong> or drag &amp; drop here
+            </p>
+            <p class="dropzone-text" style="font-size:0.75rem;margin-top:0.25rem;color:#475569;">
+              JPG, PNG, WebP — max 10MB
+            </p>
+          </div>
+
+          <!-- Upload progress bar (hidden until upload starts) -->
+          <div
+            id="upload-progress"
+            class="upload-progress"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-label="Upload progress"
+          >
+            <div id="upload-fill" class="upload-progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- ── Video Link Section ───────────────────────── -->
+        <div class="form-group mt-8">
+          <label class="form-label">
+            <i class="fa-solid fa-film" aria-hidden="true"></i>
+            Add Video Link
+          </label>
+
+          <!-- Type selector: Google Drive or Direct URL -->
+          <select
+            id="video-link-type"
+            class="form-control mb-4"
+            aria-label="Video link type"
+          >
+            <option value="drive">Google Drive File ID</option>
+            <option value="url">Direct Video URL / Embed URL</option>
+          </select>
+
+          <input
+            type="text"
+            id="video-link-input"
+            class="form-control"
+            placeholder="Paste Drive File ID or video URL here…"
+            aria-label="Video link or ID"
+          />
+          <p class="form-hint">
+            For Google Drive: copy the ID from the share link
+            (drive.google.com/file/d/<strong>[ID HERE]</strong>/view).
+            Ensure the file is shared as "Anyone with the link".
+          </p>
+
+          <button
+            id="btn-add-video"
+            class="btn btn-primary mt-4"
+            aria-label="Save video link"
+          >
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Add Video
+          </button>
+        </div>
+
+      </div>
+      <!-- /#upload-panel -->
+
+    </section>
+    <!-- /.container -->
+
+  </main>
+  <!-- /#main-content -->
+
+  <!-- ══════════════════════════════════════════════════════
+       LIGHTBOX OVERLAY
+       Activated by profile.js when a gallery image is clicked.
+  ══════════════════════════════════════════════════════════ -->
+  <div
+    id="lightbox"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image preview"
+  >
+    <button
+      id="lightbox-close"
+      aria-label="Close image preview (Escape key also works)"
+    >
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+
+    <img
+      id="lightbox-img"
+      src=""
+      alt=""
+      aria-label="Full-size preview image"
+    />
+
+    <!-- Navigation arrows for multi-image sets -->
+    <button
+      id="lightbox-prev"
+      aria-label="Previous image"
+      style="
+        position:fixed; left:var(--sp-6); top:50%; transform:translateY(-50%);
+        width:44px; height:44px; border-radius:var(--r-md);
+        background:rgba(255,255,255,0.1); backdrop-filter:blur(10px);
+        color:#fff; font-size:1.1rem; display:grid; place-items:center;
+        border:1px solid rgba(255,255,255,0.15);
+        cursor:pointer; transition:all var(--t-base);
+      "
+    >
+      <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+    </button>
+
+    <button
+      id="lightbox-next"
+      aria-label="Next image"
+      style="
+        position:fixed; right:var(--sp-6); top:50%; transform:translateY(-50%);
+        width:44px; height:44px; border-radius:var(--r-md);
+        background:rgba(255,255,255,0.1); backdrop-filter:blur(10px);
+        color:#fff; font-size:1.1rem; display:grid; place-items:center;
+        border:1px solid rgba(255,255,255,0.15);
+        cursor:pointer; transition:all var(--t-base);
+      "
+    >
+      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    </button>
+
+  </div>
+  <!-- /#lightbox -->
+
+  <!-- ══════════════════════════════════════════════════════
+       SITE FOOTER
+  ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>
+        Memory Vault &copy; <span id="footer-year"></span>
+        &mdash; Built with
+        <i class="fa-solid fa-heart" style="color:#f87171;" aria-hidden="true"></i>
+        &amp; Firebase
+      </p>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════════
+       TOAST CONTAINER
+  ══════════════════════════════════════════════════════════ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCRIPTS
+  ══════════════════════════════════════════════════════════ -->
+  <script type="module" src="profile.js"></script>
+
+  <!-- Bind lightbox prev/next arrows (can't import into inline script, so we delegate) -->
+  <script type="module">
+    // These buttons call the global-ish navigation — wired up after the module loads.
+    // profile.js exposes navigateLightbox via event delegation instead.
+    document.getElementById('lightbox-prev')?.addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('lightbox:prev'));
+    });
+    document.getElementById('lightbox-next')?.addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('lightbox:next'));
+    });
+  </script>
+
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    // Mirror the contact-card tab link from the hero external link
+    // (populated once profile.js fires, so we wait slightly)
+    setTimeout(() => {
+      const heroLink    = document.getElementById('profile-link');
+      const cardLink    = document.getElementById('contact-card-link');
+      if (heroLink && cardLink && heroLink.href !== '#') {
+        cardLink.href = heroLink.href;
+      }
+    }, 1500);
+  </script>
+
+</body>
+</html>
