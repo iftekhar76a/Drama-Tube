@@ -36,12 +36,12 @@ import { getFirestore,
 // 🔑 PASTE YOUR FIREBASE CONFIG HERE
 // ──────────────────────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",           // ← Replace
-  authDomain:        "YOUR_AUTH_DOMAIN",       // ← Replace
-  projectId:         "YOUR_PROJECT_ID",        // ← Replace
-  storageBucket:     "YOUR_STORAGE_BUCKET",    // ← Replace
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // ← Replace
-  appId:             "YOUR_APP_ID"             // ← Replace
+  apiKey:            "AIzaSyCRmbz_f1iVnD36iz3JJvLziA1Lr1Jp-nI",           // ← Replace
+  authDomain:        "my-personal-cloud-f2c31.firebaseapp.com",       // ← Replace
+  projectId:         "my-personal-cloud-f2c31",        // ← Replace
+  storageBucket:     "my-personal-cloud-f2c31.firebasestorage.app",    // ← Replace
+  messagingSenderId: "1069957164590", // ← Replace
+  appId:             "1:1069957164590:web:51221429318bc4260bb9bf"             // ← Replace
 };
 
 // Initialise Firebase services
