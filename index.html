@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  Memory Vault — index.html v2.0
+  Dashboard: Files, Profiles & Contacts with nested hierarchy
+-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Memory Vault — Secure personal cloud for contacts, media & memories." />
+  <meta name="theme-color" content="#0f172a" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Memory Vault — Dashboard</title>
+</head>
+<body>
+
+  <!-- Page Loader -->
+  <div id="page-loader" role="status" aria-label="Loading">
+    <div class="loader-ring" aria-hidden="true"></div>
+  </div>
+
+  <!-- ── Header ──────────────────────────────────────────────────────── -->
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="Memory Vault — Home">
+        <div class="logo-icon" aria-hidden="true"><i class="fa-solid fa-vault"></i></div>
+        <span class="logo-text">Memory<span>Vault</span></span>
+      </a>
+
+      <nav class="nav-actions" aria-label="User actions">
+        <div id="auth-badge" class="auth-badge" role="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="auth-badge-label">Visitor</span>
+        </div>
+        <button id="btn-login" class="btn btn-primary" aria-label="Open admin login">
+          <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i>
+          <span>Admin Login</span>
+        </button>
+        <button id="btn-logout" class="btn btn-ghost hidden" aria-label="Sign out">
+          <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+          <span>Sign Out</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Login Modal ─────────────────────────────────────────────────── -->
+  <div id="login-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+    <div class="modal-card">
+      <button id="modal-close" class="modal-close" aria-label="Close login dialog">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+      <div class="modal-header">
+        <div class="modal-icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></div>
+        <h2 id="modal-heading" class="modal-title text-gradient">Admin Access</h2>
+        <p class="modal-subtitle">Sign in to manage your vault.</p>
+      </div>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-email" class="form-label">Email Address</label>
+          <input type="email" id="login-email" class="form-control" placeholder="admin@example.com" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label for="login-password" class="form-label">Password</label>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <p id="login-error" class="form-error" role="alert"></p>
+        <button type="submit" id="login-submit" class="btn btn-primary w-full mt-4">
+          <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i>
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Main Content ────────────────────────────────────────────────── -->
+  <main id="main-content">
+    <div class="container">
+
+      <!-- Breadcrumb — shown only in nested container view -->
+      <div id="breadcrumb-nav" class="breadcrumb hidden" aria-label="Breadcrumb">
+        <a href="index.html"><i class="fa-solid fa-house" aria-hidden="true"></i> Dashboard</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span id="breadcrumb-name" class="breadcrumb-current">Container</span>
+      </div>
+
+      <!-- ── Admin Panel ─────────────────────────────────────────────── -->
+      <section id="admin-panel" class="admin-panel hidden animate-fade-up" aria-label="Admin panel">
+
+        <!-- Dashboard view: 3 creation types -->
+        <div id="admin-dashboard-forms">
+          <h2 class="admin-panel-title">
+            <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
+            Create New
+          </h2>
+
+          <!-- Type selector tabs -->
+          <div class="admin-type-tabs" role="tablist" aria-label="Create type">
+            <button class="admin-type-tab active" data-form="file" role="tab" aria-selected="true">
+              <i class="fa-solid fa-folder-plus" aria-hidden="true"></i> New File
+            </button>
+            <button class="admin-type-tab" data-form="profile" role="tab" aria-selected="false">
+              <i class="fa-solid fa-user-plus" aria-hidden="true"></i> New Profile
+            </button>
+            <button class="admin-type-tab" data-form="contact" role="tab" aria-selected="false">
+              <i class="fa-solid fa-address-book" aria-hidden="true"></i> Direct Contact
+            </button>
+          </div>
+
+          <!-- Form: New File -->
+          <div id="form-file" class="admin-form active">
+            <form id="add-file-form" novalidate>
+              <div class="form-group">
+                <label for="file-name" class="form-label">File Name</label>
+                <input type="text" id="file-name" class="form-control" placeholder="e.g. Work Contacts 2025" required />
+                <p id="err-file-name" class="form-error" role="alert"></p>
+              </div>
+              <div class="form-group">
+                <label for="file-desc" class="form-label">Description (optional)</label>
+                <input type="text" id="file-desc" class="form-control" placeholder="Short description…" />
+              </div>
+              <button type="submit" id="btn-add-file" class="btn btn-primary">
+                <i class="fa-solid fa-folder-plus" aria-hidden="true"></i>
+                Create File
+              </button>
+            </form>
+          </div>
+
+          <!-- Form: New Profile -->
+          <div id="form-profile" class="admin-form">
+            <form id="add-profile-form" novalidate>
+              <div class="form-group">
+                <label for="profile-name-input" class="form-label">Profile Name</label>
+                <input type="text" id="profile-name-input" class="form-control" placeholder="e.g. Family Memories" required />
+                <p id="err-profile-name" class="form-error" role="alert"></p>
+              </div>
+              <div class="form-group">
+                <label for="profile-desc" class="form-label">Description (optional)</label>
+                <input type="text" id="profile-desc" class="form-control" placeholder="Short description…" />
+              </div>
+              <button type="submit" id="btn-add-profile" class="btn btn-primary">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                Create Profile
+              </button>
+            </form>
+          </div>
+
+          <!-- Form: Direct Contact -->
+          <div id="form-contact" class="admin-form">
+            <form id="add-contact-form" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contact-name" class="form-label">Full Name</label>
+                  <input type="text" id="contact-name" class="form-control" placeholder="Jane Doe" required data-err-target="err-name" />
+                  <p id="err-name" class="form-error" role="alert"></p>
+                </div>
+                <div class="form-group">
+                  <label for="contact-platform" class="form-label">Platform</label>
+                  <select id="contact-platform" class="form-control" required data-err-target="err-platform">
+                    <option value="" disabled selected>Choose platform…</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="github">GitHub</option>
+                    <option value="whatsapp">WhatsApp</option>
+                  </select>
+                  <p id="err-platform" class="form-error" role="alert"></p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="contact-url" class="form-label">Profile URL</label>
+                <input type="url" id="contact-url" class="form-control" placeholder="https://facebook.com/username" required data-err-target="err-url" />
+                <p id="err-url" class="form-error" role="alert"></p>
+              </div>
+              <div class="form-group">
+                <label for="contact-bio" class="form-label">Custom Bio</label>
+                <textarea id="contact-bio" class="form-control" placeholder="A short note about this person…" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="contact-birthday" class="form-label">Birthday</label>
+                <input type="date" id="contact-birthday" class="form-control" />
+              </div>
+              <button type="submit" id="btn-add-contact" class="btn btn-primary">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Add to Vault
+              </button>
+            </form>
+          </div>
+        </div><!-- /#admin-dashboard-forms -->
+
+        <!-- Nested view: Add Contact to a specific container -->
+        <div id="admin-nested-forms" class="hidden">
+          <h2 class="admin-panel-title">
+            <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+            Add Contact to <span id="nested-container-name-label" class="text-gradient">Container</span>
+          </h2>
+          <form id="add-nested-contact-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nested-contact-name" class="form-label">Full Name</label>
+                <input type="text" id="nested-contact-name" class="form-control" placeholder="Jane Doe" required />
+                <p id="err-nested-name" class="form-error" role="alert"></p>
+              </div>
+              <div class="form-group">
+                <label for="nested-contact-platform" class="form-label">Platform</label>
+                <select id="nested-contact-platform" class="form-control" required>
+                  <option value="" disabled selected>Choose…</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="github">GitHub</option>
+                  <option value="whatsapp">WhatsApp</option>
+                </select>
+                <p id="err-nested-platform" class="form-error" role="alert"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="nested-contact-url" class="form-label">Profile URL</label>
+              <input type="url" id="nested-contact-url" class="form-control" placeholder="https://…" required />
+              <p id="err-nested-url" class="form-error" role="alert"></p>
+            </div>
+            <div class="form-group">
+              <label for="nested-contact-bio" class="form-label">Bio</label>
+              <textarea id="nested-contact-bio" class="form-control" rows="3" placeholder="Short note…"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="nested-contact-birthday" class="form-label">Birthday</label>
+              <input type="date" id="nested-contact-birthday" class="form-control" />
+            </div>
+            <button type="submit" id="btn-add-nested-contact" class="btn btn-primary">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Add Contact
+            </button>
+          </form>
+        </div><!-- /#admin-nested-forms -->
+      </section>
+      <!-- /#admin-panel -->
+
+      <!-- ── Dashboard View ─────────────────────────────────────────── -->
+      <div id="dashboard-view">
+
+        <!-- Files & Profiles Section -->
+        <section id="containers-section" aria-labelledby="containers-heading">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow"><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Files &amp; Profiles</p>
+              <h2 id="containers-heading" class="section-title">Your <span class="text-gradient">Collections</span></h2>
+              <p class="section-subtitle">Click any collection to open and manage its contacts.</p>
+            </div>
+            <div class="meta-chip" aria-live="polite">
+              <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+              <span id="containers-count">0</span> collections
+            </div>
+          </div>
+          <div id="containers-grid" class="containers-grid" role="list" aria-label="Files and Profiles">
+            <div class="skeleton-card" aria-hidden="true"></div>
+            <div class="skeleton-card" aria-hidden="true"></div>
+          </div>
+        </section>
+
+        <!-- Direct Contacts Section -->
+        <section aria-labelledby="contacts-heading">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow"><i class="fa-solid fa-users" aria-hidden="true"></i> Your Network</p>
+              <h2 id="contacts-heading" class="section-title">Contact <span class="text-gradient">Directory</span></h2>
+              <p class="section-subtitle">Click any card to view memories, photos, and videos.</p>
+            </div>
+            <div class="meta-chip" aria-live="polite">
+              <i class="fa-solid fa-address-book" aria-hidden="true"></i>
+              <span id="contacts-count">…</span> contacts
+            </div>
+          </div>
+          <div id="contacts-grid" class="contacts-grid" role="list" aria-label="Contact cards">
+            <div class="skeleton-card" aria-hidden="true"></div>
+            <div class="skeleton-card" aria-hidden="true"></div>
+            <div class="skeleton-card" aria-hidden="true"></div>
+          </div>
+        </section>
+
+      </div><!-- /#dashboard-view -->
+
+      <!-- ── Nested Container View ──────────────────────────────────── -->
+      <div id="nested-view" class="hidden">
+        <section aria-labelledby="nested-contacts-heading">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow" id="nested-eyebrow"><i class="fa-solid fa-users" aria-hidden="true"></i> Contacts</p>
+              <h2 id="nested-contacts-heading" class="section-title">
+                <span id="nested-container-title" class="text-gradient">Container</span>
+              </h2>
+              <p class="section-subtitle">All contacts saved inside this collection.</p>
+            </div>
+            <div class="meta-chip" aria-live="polite">
+              <i class="fa-solid fa-address-book" aria-hidden="true"></i>
+              <span id="nested-contacts-count">0</span> contacts
+            </div>
+          </div>
+          <div id="nested-contacts-grid" class="contacts-grid" role="list" aria-label="Nested contacts">
+            <div class="skeleton-card" aria-hidden="true"></div>
+            <div class="skeleton-card" aria-hidden="true"></div>
+          </div>
+        </section>
+      </div><!-- /#nested-view -->
+
+    </div><!-- /.container -->
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────── -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>
+        Memory Vault &copy; <span id="footer-year"></span> &mdash;
+        Built with <i class="fa-solid fa-heart" style="color:#f87171" aria-hidden="true"></i> &amp; Firebase
+      </p>
+    </div>
+  </footer>
+
+  <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <script type="module" src="main.js"></script>
+  <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
